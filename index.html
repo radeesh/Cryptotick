@@ -1,0 +1,62 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hello world</title>
+  <!-- Script tags including React -->
+  <script src="./js/react.min.js"></script>
+  <script src="./js/react-dom.min.js"></script>
+  <script src="./js/browser.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script> -->
+  <!-- <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script> -->
+  <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="text/babel">
+
+  class App extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        isLoading: true,
+        tickers: []
+      }
+    }
+    componentWillMount() {
+        fetch("https://api.coinmarketcap.com/v1/ticker/?limit=10")
+        .then((response) => response.json()) // Transform the data into json
+        .then(data => this.setState({
+            isLoading: false,
+            tickers: data
+          }))
+        .catch(error => console.log('parsing failed', error))
+    }
+    render() {
+      return (
+        <div>
+          <ul className="list">
+          {this.state.tickers.map(function(ticker, index){
+            var imgsrc = "https://files.coinmarketcap.com/static/img/coins/64x64/"+ticker.id+".png";
+            return  <li className="list__item">
+                      <div className="list__item__left">
+                        <img className="list__item__thumbnail" src= {imgsrc} alt={ticker.name}/>
+                      </div>
+
+                      <div className="list__item__center">
+                        <div className="list__item__title">{ticker.name} ({ticker.symbol})</div>
+                        <div className="list__item__subtitle">${ticker.price_usd} {ticker.price_btc} BTC 1h {ticker.percent_change_1h}| 24h {ticker.percent_change_24h}| 7d {ticker.percent_change_7d}</div>
+                      </div>
+                    </li>;
+                })}
+          </ul>
+        </div>
+      )
+    }
+  }
+
+  var mount = document.querySelector('#app');
+  ReactDOM.render(<App />, mount);
+  </script>
+</body>
+</html>
