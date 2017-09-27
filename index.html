@@ -8,6 +8,7 @@
   <script src="./js/browser.min.js"></script>
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="stylesheet" type="text/css" href="search.css">
+  <link rel="stylesheet" type="text/css" href="navigation.css">
 </head>
 <body>
   <div id="app"></div>
@@ -55,7 +56,7 @@
           console.log("get"+coinFilterVar);
         }
       });
-      let filterText = coinFilterVar.toLowerCase().split(',');
+      let filterText = coinFilterVar.replace(/\s/g, '').toLowerCase().split(',');
       return (
         <div>
           <input type="search" value={coinFilterVar} placeholder="Search eg: bitcoin,ethereum,nav-coin" className="search-input" onChange={this.handleChange}/>
@@ -79,6 +80,7 @@
                     </li>;
                 })}
           </ul>
+
         </div>
       )
     }
