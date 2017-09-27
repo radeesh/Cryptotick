@@ -1,6 +1,6 @@
 #app{
   width: 480px;
-  height:580px;
+  height: auto;
 }
 .switch {
   position: relative;

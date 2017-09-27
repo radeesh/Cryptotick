@@ -6,37 +6,66 @@
   <script src="./js/react.min.js"></script>
   <script src="./js/react-dom.min.js"></script>
   <script src="./js/browser.min.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script> -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script> -->
-  <!-- <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script> -->
   <link rel="stylesheet" type="text/css" href="index.css">
+  <link rel="stylesheet" type="text/css" href="search.css">
 </head>
 <body>
   <div id="app"></div>
   <script type="text/babel">
-
+  let coinFilterVar = 'bitcoin';
   class App extends React.Component {
     constructor(props) {
       super(props);
+      chrome.storage.sync.get("coinFilterStore", function(items) {
+        if (!chrome.runtime.error) {
+          coinFilterVar=items.coinFilterStore;
+        }
+      });
       this.state = {
         isLoading: true,
-        tickers: []
+        tickers: [],
+        coinFilters: coinFilterVar
       }
+      this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(event) {
+      coinFilterVar = event.target.value;
+      chrome.storage.sync.set({ "coinFilterStore" : coinFilterVar }, function() {
+        if (chrome.runtime.error) {
+          console.log("Runtime error.");
+        }
+        console.log(coinFilterVar);
+      });
+      this.setState({coinFilters: event.target.value});
     }
     componentWillMount() {
-        fetch("https://api.coinmarketcap.com/v1/ticker/?limit=10")
-        .then((response) => response.json()) // Transform the data into json
-        .then(data => this.setState({
-            isLoading: false,
-            tickers: data
-          }))
-        .catch(error => console.log('parsing failed', error))
+      fetch("https://api.coinmarketcap.com/v1/ticker/")
+      .then((response) => response.json()) // Transform the data into json
+      .then(data => this.setState({
+          isLoading: false,
+          tickers: data
+        }))
+      .catch(error => console.log('parsing failed', error))
     }
     render() {
+      chrome.storage.sync.get("coinFilterStore", function(items) {
+        if (!chrome.runtime.error) {
+          coinFilterVar=items.coinFilterStore;
+          console.log("get"+coinFilterVar);
+        }
+      });
+      let filterText = coinFilterVar.toLowerCase().split(',');
       return (
         <div>
+          <input type="search" value={coinFilterVar} placeholder="Search eg: bitcoin,ethereum,nav-coin" className="search-input" onChange={this.handleChange}/>
+          <br/>
           <ul className="list">
-          {this.state.tickers.map(function(ticker, index){
+          {this.state.tickers
+            .filter(function(ticker, index) {
+            return filterText.includes(ticker.id);
+            })
+            .map(function(ticker, index){
             var imgsrc = "https://files.coinmarketcap.com/static/img/coins/64x64/"+ticker.id+".png";
             return  <li className="list__item">
                       <div className="list__item__left">
@@ -54,7 +83,6 @@
       )
     }
   }
-
   var mount = document.querySelector('#app');
   ReactDOM.render(<App />, mount);
   </script>
