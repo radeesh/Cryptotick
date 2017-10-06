@@ -32,7 +32,6 @@ class App extends React.Component {
       if (chrome.runtime.error) {
         console.log("Runtime error.");
       }
-      console.log("setCoinFilterChrome tags "+tags);
     });
   }
 
@@ -40,16 +39,12 @@ class App extends React.Component {
     const tags = this.state.tags.slice(0)
     tags.splice(i, 1)
     this.setState({ tags })
-    console.log("Deleting...")
-    console.log(tags)
     this.setCoinFilterChrome(tags)
   }
 
   handleAddition (tag) {
     const tags = [].concat(this.state.tags, tag)
     this.setState({ tags })
-    console.log("Adding...")
-    console.log(tags)
     this.setCoinFilterChrome(tags)
   }
 
@@ -60,8 +55,6 @@ class App extends React.Component {
           filterTags=[{ id: 'bitcoin', name: 'Bitcoin' }];
         }
         else {filterTags=items.filterTags}
-        console.log("sync.get filterTags ");
-        console.log(filterTags);
       }
     });
     fetch("https://api.coinmarketcap.com/v1/ticker/")
