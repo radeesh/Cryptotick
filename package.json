@@ -1,0 +1,28 @@
+{
+  "name": "Cryptotick",
+  "version": "1.0.0",
+  "description": "Cryptocurrency information",
+  "main": "index.js",
+  "repository": "https://github.com/radeesh/Cryptotick.git",
+  "homepage": "./",
+  "author": "Radeesh",
+  "license": "MIT",
+  "dependencies": {
+    "path": "^0.12.7",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-tag-autocomplete": "^5.4.1",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.9.1"
+  },
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1"
+  }
+}
