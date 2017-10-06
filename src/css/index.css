@@ -6,6 +6,10 @@
   width: 480px;
   height: auto;
 }
+.donate {
+  cursor: pointer;
+  text-decoration: underline;
+}
 .switch {
   position: relative;
   display: inline-block;

@@ -15,8 +15,16 @@ class App extends React.Component {
       isLoading: true,
       tickers: [],
       tags: filterTags,
-      suggestions: []
+      suggestions: [],
+      showDonate: false
     }
+    this.handleToggleClick = this.handleToggleClick.bind(this);
+  }
+
+  handleToggleClick() {
+    this.setState(prevState => ({
+      showDonate: !prevState.showDonate
+    }));
   }
 
   setCoinFilterChrome(tags){
@@ -68,9 +76,18 @@ class App extends React.Component {
   }
   render() {
     let showCoins=[];
+    var donate = null;
     this.state.tags.map(function(ticker,index){
       showCoins = [].concat(showCoins, ticker.name)
     })
+    if (this.state.showDonate){
+      donate =
+        <div>
+          <div className="tiny"> ETH - 0x9aF0948fE56c1f26bB70F70f88cE86cdFe4E6871 </div>
+          <div className="tiny"> ARK - AaQSCKxmrWhoPKkT4BfperknqrJmzQpUSH </div>
+          <div className="tiny"> Litecoin - LaArBQHSHpWidbY2gVEcurSn5a2U679FQC</div>
+        </div>;
+    }
     return (
       <div>
         <Tags
@@ -92,12 +109,13 @@ class App extends React.Component {
 
                     <div className="list__item__center">
                       <div className="list__item__title">{ticker.name} ({ticker.symbol})</div>
-                      <div className="list__item__subtitle">${ticker.price_usd} {ticker.price_btc} BTC 1h {ticker.percent_change_1h}| 24h {ticker.percent_change_24h}| 7d {ticker.percent_change_7d}</div>
+                      <div className="list__item__subtitle">${ticker.price_usd} {ticker.price_btc} BTC 1h {ticker.percent_change_1h} | 24h {ticker.percent_change_24h} | 7d {ticker.percent_change_7d}</div>
                     </div>
                   </li>;
               })}
         </ul>
-
+        <div className="tiny"><a className="donate" onClick={this.handleToggleClick}>Donate</a> <a href="https://github.com/radeesh/Cryptotick">Github</a></div>
+        {donate}
       </div>
     )
   }
