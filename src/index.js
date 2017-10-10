@@ -87,7 +87,7 @@ class App extends React.Component {
           tags={this.state.tags}
           suggestions={this.state.suggestions}
           handleDelete={this.handleDelete.bind(this)}
-          handleAddition={this.handleAddition.bind(this)} />
+          handleAddition={this.handleAddition.bind(this)} placeholder="Add Coin Name" />
         <ul className="list">
         {this.state.suggestions
           .filter(function(ticker, index) {
@@ -102,12 +102,12 @@ class App extends React.Component {
 
                     <div className="list__item__center">
                       <div className="list__item__title">{ticker.name} ({ticker.symbol})</div>
-                      <div className="list__item__subtitle">${ticker.price_usd} {ticker.price_btc} BTC 1h {ticker.percent_change_1h} | 24h {ticker.percent_change_24h} | 7d {ticker.percent_change_7d}</div>
+                      <div className="list__item__subtitle">${ticker.price_usd} | {ticker.price_btc} BTC | 1h <b className={ticker.percent_change_1h > 0?'green':'red'}>{ticker.percent_change_1h}</b> | 24h <b className={ticker.percent_change_24h > 0?'green':'red'}>{ticker.percent_change_24h}</b> | 7d <b className={ticker.percent_change_7d > 0?'green':'red'}>{ticker.percent_change_7d}</b></div>
                     </div>
                   </li>;
               })}
         </ul>
-        <div className="tiny"><a className="donate" onClick={this.handleToggleClick}>Donate</a> <a href="https://github.com/radeesh/Cryptotick">Github</a></div>
+        <div className="tiny">Powered by <a href="https://coinmarketcap.com/api/">Coinmarketcap API</a> | <a className="donate" onClick={this.handleToggleClick}>Donate</a> | <a href="https://github.com/radeesh/Cryptotick">Github</a></div>
         {donate}
       </div>
     )

@@ -10,6 +10,12 @@
   cursor: pointer;
   text-decoration: underline;
 }
+.green {
+  color: green;
+}
+.red {
+  color: red;
+}
 .switch {
   position: relative;
   display: inline-block;
