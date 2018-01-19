@@ -1,6 +1,21 @@
+a {
+  text-decoration: none;
+  color: black;
+}
 .tiny{
   text-align: center;
   font-size: 9px;
+}
+.tinyLeft{
+  text-align: left;
+  padding-top: 5px;
+  padding-left: 10px;
+  font-size: 9px;
+}
+.right{
+  float: right;
+  padding-top: 5px;
+  padding-right: 5px;
 }
 #app{
   width: 480px;

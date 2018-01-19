@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import Tags from 'react-tag-autocomplete';
 let filterTags = [{id: 'bitcoin', name:'Bitcoin'}, { id: 'litecoin', name: 'Litecoin' }];
+let badgeCurrency = 'bitcoin';
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -11,19 +12,39 @@ class App extends React.Component {
         filterTags=items.filterTags;
       }
     });
+
+    chrome.storage.sync.get("badgeCurrency", function(items) {
+      if (!chrome.runtime.error) {
+        if (typeof items.badgeCurrency == "undefined") {
+          badgeCurrency='bitcoin';
+        }
+        else {badgeCurrency=items.badgeCurrency;}
+      }
+    });
+
     this.state = {
       isLoading: true,
       tickers: [],
       tags: filterTags,
       suggestions: [],
-      showDonate: false
+      showDonate: false,
+      showSettings: false,
+      badgeCurrencyState: badgeCurrency
     }
-    this.handleToggleClick = this.handleToggleClick.bind(this);
+    this.handleDonateToggleClick = this.handleDonateToggleClick.bind(this);
+    this.handleSettingsToggleClick = this.handleSettingsToggleClick.bind(this);
+    this.handleBadgeChange = this.handleBadgeChange.bind(this);
   }
 
-  handleToggleClick() {
+  handleDonateToggleClick() {
     this.setState(prevState => ({
       showDonate: !prevState.showDonate
+    }));
+  }
+
+  handleSettingsToggleClick() {
+    this.setState(prevState => ({
+      showSettings: !prevState.showSettings
     }));
   }
 
@@ -48,6 +69,64 @@ class App extends React.Component {
     this.setCoinFilterChrome(tags)
   }
 
+  
+  handleBadgeChange(e){
+    chrome.browserAction.setBadgeText({text: ''})
+    badgeCurrency = e.target.value;
+    this.setState({badgeCurrencyState:e.target.value});
+    chrome.storage.sync.set({ "badgeCurrency" : e.target.value }, function() {
+      if (chrome.runtime.error) {
+        console.log("Runtime error.");
+      }
+    });
+    timer()  
+  }  
+
+  componentDidMount() {
+    var intervalId = setInterval(this.timer, 60000);
+    // store intervalId in the state so it can be accessed later:
+    this.setState({intervalId: intervalId});
+    this.setState({badgeCurrencyState: badgeCurrency});
+  }
+
+  timer() {
+    chrome.storage.sync.get("badgeCurrency", function(items) {
+      if (!chrome.runtime.error) {
+        if (typeof items.badgeCurrency == "undefined") {
+          badgeCurrency='bitcoin';
+        }
+        else {badgeCurrency=items.badgeCurrency;}
+        fetch("https://api.coinmarketcap.com/v1/ticker/"+badgeCurrency)
+        .then((response) => response.json()) // Transform the data into json
+        .then(data => 
+          {
+            var price = 0;
+            var curPrice = data[0].price_usd;
+            if(curPrice>1000){
+              price = curPrice/1000;
+              price = price.toString().substring(0,4)+'k';
+            }
+            else if(curPrice<1000 && curPrice>1){
+              price = curPrice.substring(0,5)
+            }
+            else{
+              price = curPrice.substring(0,4)
+            }
+            console.log(price)
+            chrome.browserAction.setBadgeText({text: price})
+          }
+          //console.log(data[0].price_usd)
+        )
+        .catch(error => console.log('parsing failed', error))        
+      }
+    });    
+  }
+ 
+  componentWillUnmount() {
+    // use intervalId from the state to clear the interval
+    clearInterval(this.state.intervalId);
+  }
+
   componentWillMount() {
     chrome.storage.sync.get("filterTags", function(items) {
       if (!chrome.runtime.error) {
@@ -70,17 +149,32 @@ class App extends React.Component {
   render() {
     let showCoins=[];
     var donate = null;
+    var settings = null;
     this.state.tags.map(function(ticker,index){
       showCoins = [].concat(showCoins, ticker.name)
     })
     if (this.state.showDonate){
       donate =
         <div>
-          <div className="tiny"> ETH - 0x9aF0948fE56c1f26bB70F70f88cE86cdFe4E6871 </div>
-          <div className="tiny"> ARK - AaQSCKxmrWhoPKkT4BfperknqrJmzQpUSH </div>
-          <div className="tiny"> Litecoin - LaArBQHSHpWidbY2gVEcurSn5a2U679FQC</div>
+          <div className="tiny"> Bitcoin - 3H1agDvNjjYDgagcVAiBCPSj3eCWt5HNdJ </div>
+          <div className="tiny"> Litecoin - LR1wbvhAbrSKFMgbqjhNvVJC1NCjhge6B6</div>
+          <div className="tiny"> Ethereum - 0x9aF0948fE56c1f26bB70F70f88cE86cdFe4E6871 </div>
         </div>;
     }
+    if (this.state.showSettings){
+      settings =
+        <div className="tinyLeft" id="settings">
+          <label>Show Notification Badge <select defaultValue={badgeCurrency} id="badgeCurrency" onChange={this.handleBadgeChange} >
+          {this.state.suggestions
+          .filter(function(ticker, index) {
+          return showCoins.includes(ticker.name);
+          })
+          .map(function(ticker, index){      
+            return <option value={ticker.id}>{ticker.name}</option>
+          })}
+          </select></label>
+        </div>;
+    }    
     return (
       <div>
         <Tags
@@ -95,19 +189,20 @@ class App extends React.Component {
           })
           .map(function(ticker, index){
           var imgsrc = "https://files.coinmarketcap.com/static/img/coins/64x64/"+ticker.id+".png";
+          var urlsrc = "https://coinmarketcap.com/currencies/"+ticker.id;
           return  <li key={ticker.id} className="list__item">
                     <div className="list__item__left">
-                      <img className="list__item__thumbnail" src= {imgsrc} alt={ticker.name}/>
+                      <a target="_blank" href = {urlsrc}><img className="list__item__thumbnail" src= {imgsrc} alt={ticker.name}/></a>
                     </div>
-
                     <div className="list__item__center">
-                      <div className="list__item__title">{ticker.name} ({ticker.symbol})</div>
+                      <div className="list__item__title"><a target="_blank" href = {urlsrc}> {ticker.name} ({ticker.symbol})</a></div>
                       <div className="list__item__subtitle">${ticker.price_usd} | {ticker.price_btc} BTC | 1h <b className={ticker.percent_change_1h > 0?'green':'red'}>{ticker.percent_change_1h}</b> | 24h <b className={ticker.percent_change_24h > 0?'green':'red'}>{ticker.percent_change_24h}</b> | 7d <b className={ticker.percent_change_7d > 0?'green':'red'}>{ticker.percent_change_7d}</b></div>
                     </div>
                   </li>;
               })}
         </ul>
-        <div className="tiny">Powered by <a href="https://coinmarketcap.com/api/">Coinmarketcap API</a> | <a className="donate" onClick={this.handleToggleClick}>Donate</a> | <a href="https://github.com/radeesh/Cryptotick">Github</a></div>
+        {settings}
+        <div className="tiny">Powered by <a href="https://coinmarketcap.com/api/">Coinmarketcap API</a> | <a className="donate" onClick={this.handleDonateToggleClick}>Donate</a> | <a href="https://github.com/radeesh/Cryptotick">Github</a> <img className="right" src="./imgs/settings.png" onClick={this.handleSettingsToggleClick}></img></div>
         {donate}
       </div>
     )
