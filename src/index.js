@@ -106,16 +106,14 @@ class App extends React.Component {
               price = curPrice/1000;
               price = price.toString().substring(0,4)+'k';
             }
-            else if(curPrice<1000 && curPrice>1){
-              price = curPrice.substring(0,5)
+            else if(curPrice<1000 && curPrice>99){
+              price = Math.round(curPrice);
             }
             else{
-              price = curPrice.substring(0,4)
+              price = curPrice.toString().substring(0,4);
             }
-            console.log(price)
-            chrome.browserAction.setBadgeText({text: price})
+            chrome.browserAction.setBadgeText({text: price.toString()})
           }
-          //console.log(data[0].price_usd)
         )
         .catch(error => console.log('parsing failed', error))        
       }
