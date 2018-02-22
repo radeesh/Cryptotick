@@ -69,7 +69,7 @@ class App extends React.Component {
     this.setCoinFilterChrome(tags)
   }
 
-  
+
   handleBadgeChange(e){
     chrome.browserAction.setBadgeText({text: ''})
     badgeCurrency = e.target.value;
@@ -79,8 +79,8 @@ class App extends React.Component {
         console.log("Runtime error.");
       }
     });
-    timer()  
-  }  
+    timer()
+  }
 
   componentDidMount() {
     var intervalId = setInterval(this.timer, 60000);
@@ -98,7 +98,7 @@ class App extends React.Component {
         else {badgeCurrency=items.badgeCurrency;}
         fetch("https://api.coinmarketcap.com/v1/ticker/"+badgeCurrency)
         .then((response) => response.json()) // Transform the data into json
-        .then(data => 
+        .then(data =>
           {
             var price = 0;
             var curPrice = data[0].price_usd;
@@ -115,11 +115,11 @@ class App extends React.Component {
             chrome.browserAction.setBadgeText({text: price.toString()})
           }
         )
-        .catch(error => console.log('parsing failed', error))        
+        .catch(error => console.log('parsing failed', error))
       }
-    });    
+    });
   }
- 
+
   componentWillUnmount() {
     // use intervalId from the state to clear the interval
     clearInterval(this.state.intervalId);
@@ -167,12 +167,12 @@ class App extends React.Component {
           .filter(function(ticker, index) {
           return showCoins.includes(ticker.name);
           })
-          .map(function(ticker, index){      
+          .map(function(ticker, index){
             return <option value={ticker.id}>{ticker.name}</option>
           })}
           </select></label>
         </div>;
-    }    
+    }
     return (
       <div>
         <Tags
@@ -186,7 +186,7 @@ class App extends React.Component {
           return showCoins.includes(ticker.name);
           })
           .map(function(ticker, index){
-          var imgsrc = "https://files.coinmarketcap.com/static/img/coins/64x64/"+ticker.id+".png";
+          var imgsrc = "https://files.coinmarketcap.com/static/img/coins/64x64/"+ticker.rank+".png";
           var urlsrc = "https://coinmarketcap.com/currencies/"+ticker.id;
           return  <li key={ticker.id} className="list__item">
                     <div className="list__item__left">
