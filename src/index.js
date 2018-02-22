@@ -188,10 +188,10 @@ class App extends React.Component {
           .map(function(ticker, index){
           var imgsrc = "https://files.coinmarketcap.com/static/img/coins/64x64/"+ticker.rank+".png";
           var urlsrc = "https://coinmarketcap.com/currencies/"+ticker.id;
+          // <div className="list__item__left">
+          //   <a target="_blank" href = {urlsrc}><img className="list__item__thumbnail" src= {imgsrc} alt={ticker.name}/></a>
+          // </div>
           return  <li key={ticker.id} className="list__item">
-                    <div className="list__item__left">
-                      <a target="_blank" href = {urlsrc}><img className="list__item__thumbnail" src= {imgsrc} alt={ticker.name}/></a>
-                    </div>
                     <div className="list__item__center">
                       <div className="list__item__title"><a target="_blank" href = {urlsrc}> {ticker.name} ({ticker.symbol})</a></div>
                       <div className="list__item__subtitle">${ticker.price_usd} | {ticker.price_btc} BTC | 1h <b className={ticker.percent_change_1h > 0?'green':'red'}>{ticker.percent_change_1h}</b> | 24h <b className={ticker.percent_change_24h > 0?'green':'red'}>{ticker.percent_change_24h}</b> | 7d <b className={ticker.percent_change_7d > 0?'green':'red'}>{ticker.percent_change_7d}</b></div>
