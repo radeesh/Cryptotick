@@ -3,7 +3,7 @@
 
   "name": "Cryptotick",
   "description": "Cryptocurrency ticker for any coin you choose, get a quick overview of coins.",
-  "version": "0.4",
+  "version": "0.5",
 
   "browser_action": {
     "default_icon": "imgs/btc128.png",
